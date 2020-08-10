@@ -1,0 +1,38 @@
+Date        Start       Stop        Activity        Comments
+
+# handle with subset_0
+20/07/01    16:00       18:00	    coding shrug-init       implemented basic init functionality
+20/07/01	18:00       19:00       debugging               found bugs shrug-init
+20/07/01    19:30       21:30	    coding shrug-add        implemented basic add functionality
+20/07/01	22:00       23:00       debugging               found bugs shrug-add
+
+20/07/02    16:00       18:00	    coding shrug-commit     implemented basic commit functionality
+20/07/02	18:00       19:00       debugging               found bugs shrug-commit
+20/07/02    19:30       21:30	    coding shrug-log        implemented basic log functionality
+20/07/02	22:00       23:00       debugging               found bugs shrug-log
+
+20/07/03    16:00       18:00	    coding shrug-show       implemented basic show functionality
+20/07/03	18:00       19:00       debugging               found bugs shrug-show
+# subset_0 done
+
+
+# handle with subset_1
+20/07/04    10:00       14:00	    coding shrug-commit -a  implemented basic commit -a functionality
+20/07/04	14:00       15:00       debugging               found bugs shrug-commit -a option
+
+20/07/05    10:00       14:00	    coding shrug-rm         implemented basic rm functionality
+20/07/05	14:00       15:00       debugging               found bugs shrug-rm
+20/07/05    15:30       21:30	    coding shrug-rm         implemented basic rm functionality
+20/07/05	22:00       23:00       debugging               found bugs shrug-rm
+
+20/07/06    10:00       14:00	    coding shrug-status     keep implementing basic status functionality
+20/07/06	14:00       15:00       debugging               keep finding bugs shrug-status
+20/07/06    15:30       21:30	    coding shrug-status     keep implementing basic status functionality
+20/07/06	22:00       23:00       debugging               keep finding bugs shrug-status
+# subset_1 done
+
+
+# handle with test shell
+20/07/09    10:00       14:00	    coding test00--04.sh    testing shell 00 to 04
+20/07/09    15:30       21:30	    coding test05--09.sh    testing shell 05 to 09
+# test shell done

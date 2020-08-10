@@ -1,0 +1,46 @@
+#!/bin/dash
+
+if test $# -ne 1
+then
+    echo "Usage: $0 [commit_id]:filename..."
+    exit 1
+fi
+
+arg1=$1
+commit_id=$(echo "$arg1" | cut -d ':' -f1)
+filename=$(echo "$arg1" | cut -d ':' -f2)
+
+
+if echo "$commit_id" | egrep "[0-9]+" > /dev/null  # when commit_id exists
+then
+    # echo "commit_id is : $commit_id"
+    # echo "filename is : $filename"
+
+    # 1. test commit_id if valid
+    if test -e .shrug/repo/$commit_id/  # if commit_id exits
+    then
+        # 1. test filename if valid
+        if test -e .shrug/repo/$commit_id/$filename  # if filename exits
+        then
+            cat .shrug/repo/$commit_id/$filename
+            exit 0
+        else  # if filename does not exit
+            echo "$0: error: '$filename' not found in commit $commit_id"
+            exit 1
+        fi
+    else  # if commit_id does not exit
+        echo "$0: error: unknown commit '$commit_id'"
+        exit 1
+    fi
+else  # when commit_id is omitted
+    # echo "commit_id is : empty"
+    # echo "filename is : $filename"
+    if test -e .shrug/index/$filename
+    then
+        cat .shrug/index/$filename
+        exit 0
+    else
+        echo "$0: error: '$filename' not found in index"
+        exit 1
+    fi
+fi

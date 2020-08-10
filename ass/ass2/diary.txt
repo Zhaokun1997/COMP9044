@@ -1,0 +1,33 @@
+Date        Start       Stop        Activity        Comments
+
+# handle with subset_0 & subset_1
+20/07/26    16:00       18:00	    coding subset_0         implemented subset_0 basic functionality
+20/07/26	18:00       19:00       debugging               found bugs
+20/07/26    19:30       21:30	    coding subset_0         implemented subset_0 basic functionality
+20/07/26	22:00       23:00       debugging               remove bugs
+
+20/07/27    16:00       18:00	    coding subset_1         implemented subset_1 basic functionality
+20/07/27	18:00       19:00       debugging               found bugs
+20/07/27    19:30       21:30	    coding subset_1         implemented subset_1 basic functionality
+20/07/27	22:00       23:00       debugging               remove bugs
+# subset_0 & subset_1 done
+
+
+# handle with subset_2 & subset_3
+20/07/28    10:00       14:00	    coding subset_2         implemented subset_2 basic functionality
+20/07/28	14:00       15:00       debugging               found bugs
+20/07/28    15:30       21:30	    coding subset_2         implemented subset_2 basic functionality
+20/07/28	22:00       23:00       debugging               remove bugs
+
+20/07/29    10:00       14:00	    coding subset_3         implemented subset_3 basic functionality
+20/07/29	14:00       15:00       debugging               found bugs
+20/07/29    15:30       21:30	    coding subset_3         implemented subset_3 basic functionality
+20/07/29	22:00       23:00       debugging               remove bugs
+# subset_2 & subset_3 done
+
+
+# handle with subset_4
+20/07/30    10:00       19:00	    coding subset_4         implemented subset_3 basic functionality
+20/07/30    19:30       21:30	    coding subset_4         implemented subset_3 basic functionality
+20/07/30    21:30       22:30	    debugging               found bugs & remove bugs
+# subset_4 done

@@ -1,0 +1,100 @@
+#!/bin/dash
+
+if test $# -ne 0
+then
+    echo "Usage: $0"
+    exit 1
+fi
+
+
+# a - file changed, different changes staged for commit    +++
+# b - file changed, changes staged for commit    +++
+# c - file changed, changes not staged for commit    +++
+# d - file deleted    +++
+# e - deleted    +++
+# f - same as repo    +++
+# g - added to index    +++
+# h - untracked    +++
+
+
+# find current commit_id and all files needed to be compared
+last_commit_id=$(cat .shrug/shrug.log | head -1 | cut -d ' ' -f1)
+if echo "$last_commit_id" | egrep '[0-9]+' > /dev/null  # if there is record in commit_log
+then
+    all_files=$(find ./ .shrug/index/ .shrug/repo/$last_commit_id -type f | egrep -v 'shrug\.log|test.*|diary|shrug-.*' | sed 's/.*\// /g' | sort | uniq | sort)
+else
+    all_files=$(find ./ .shrug/index/ -type f | egrep -v 'shrug\.log|test.*|diary|shrug-.*' | sed 's/.*\// /g' | sort | uniq | sort)
+fi
+
+
+for file in $all_files
+do
+    index_file=".shrug/index/$file"
+    repo_file=".shrug/repo/$last_commit_id/$file"
+    if test -e "$file"  # when file in local
+    then
+        if test -e "$index_file"  # when file in local, in index
+        then
+            if test -e "$repo_file"  # when file in local, in index, in repo
+            then
+
+
+                # compare differences
+                if diff -q "$file" "$index_file" > /dev/null  # local_file == index_file
+                then
+                    if diff -q "$index_file" "$repo_file" > /dev/null  # local_file == index_file == repo_file
+                    then
+                        echo "$file - same as repo"
+                    else  # local_file == index_file != repo_file
+                        echo "$file - file changed, changes staged for commit"
+                    fi
+                else  # local_file != index_file
+                    if diff -q "$index_file" "$repo_file" > /dev/null  # local_file != index_file == repo_file
+                    then
+                        echo "$file - file changed, changes not staged for commit"
+                    else  # local_file != index_file != repo_file
+                        echo "$file - file changed, different changes staged for commit"
+                    fi
+                fi
+
+
+            else  # when file in local, in index, not in repo
+
+
+                # compare differences
+                if diff -q "$file" "$index_file" > /dev/null  # local_file == index_file
+                then
+                    echo "$file - added to index"
+                else  # local_file != index_file
+                    echo "$file - added to index, file changed"
+                fi
+
+
+            fi
+        else  # when file in local, not in index
+            if test -e "$repo_file"  # when file in local, not in index, in repo
+            then
+                echo "$file - untracked"
+            else  # when file in local, not in index, not in repo
+                echo "$file - untracked"
+            fi
+        fi
+    else  # when file is not in local
+        if test -e "$index_file"  # when file is not in local, but in index
+        then
+            if test -e "$repo_file"  # when file is not in local, but in index, in repo
+            then
+                echo "$file - file deleted"
+            else  # when file is not in local, but in index, not in repo
+                echo "$file - added to index, file deleted"
+            fi
+        else  # when file is not in local, not in index
+            if test -e "$repo_file"  # when file is not in local, not in index, but in repo
+            then
+                echo "$file - deleted"  
+            fi
+        fi
+    fi
+done
+
+

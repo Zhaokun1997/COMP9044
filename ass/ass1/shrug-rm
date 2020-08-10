@@ -1,0 +1,180 @@
+#!/bin/dash
+
+# shrug-rm [--force] [--cached] filenames
+
+if test "$#" -eq 0
+then
+    echo "Usage: $0 [--force] [--cached] <filenames>..."
+    exit 1
+fi
+
+force_option=0
+cached_option=0
+
+if test "$1" = "--force"
+then
+    force_option=1
+    shift
+fi
+
+
+if test "$1" = "--cached"
+then
+    cached_option=1
+    shift
+fi
+
+
+# case : shrug-rm filenames
+# it tries to delete file in both index and local
+if test "$force_option" -eq 0 && test "$cached_option" -eq 0
+then
+    # first get last commit id
+    last_commit_id=$(cat .shrug/shrug.log | head -1 | cut -d ' ' -f1)
+    for file in "$@"
+    do
+        repo_file=".shrug/repo/$last_commit_id/$file"
+        index_file=".shrug/index/$file"
+
+        if test ! -e "$index_file"  # if file is not in index
+        then
+            echo "$0: error: '$file' is not in the shrug repository"
+            exit 1
+        else  # if file is in index
+            if test -e "$file"  # file in index and in local
+            then
+                if test -e "$repo_file" # file in index, local and last_repo
+                then
+                    if ! diff -q "$file" "$index_file" > /dev/null && ! diff -q "$index_file" "$repo_file" > /dev/null  # local != index != repo
+                    then
+                        echo "$0: error: '$file' in index is different to both working file and repository"
+                        exit 1
+                    elif ! diff -q "$file" "$index_file" > /dev/null && diff -q "$index_file" "$repo_file" > /dev/null  # local != index == repo
+                    then
+                        echo "$0: error: '$file' in repository is different to working file"
+                        exit 1
+                    elif diff -q "$file" "$index_file" > /dev/null && ! diff -q "$index_file" "$repo_file" > /dev/null  # local == index != repo
+                    then
+                        echo "$0: error: '$file' has changes staged in the index"
+                        exit 1
+                    fi
+                else  # file in index and local,but not in last_repo
+                    echo "$0: error: '$file' has changes staged in the index"
+                    exit 1
+                fi
+            else  # file in index but not in local
+                echo "$0: error: '$file' has changes staged in the index"
+                exit 1
+            fi
+        fi
+    done
+
+    # delete index/files and ./files
+    for file in "$@"
+    do
+        if test -e "$file"
+        then
+            rm $file
+        fi
+        rm .shrug/index/$file
+    done
+    exit 0
+fi
+
+# case : shrug-rm [--cached] filenames
+if test "$force_option" -eq 0 && test "$cached_option" -eq 1
+then
+    # first get last commit id
+    last_commit_id=$(cat .shrug/shrug.log | head -1 | cut -d ' ' -f1)
+
+    for file in "$@"
+    do
+        repo_file=".shrug/repo/$last_commit_id/$file"
+        index_file=".shrug/index/$file"
+
+        if test ! -e "$index_file"  # if file is not in index
+        then
+            echo "$0: error: '$file' is not in the shrug repository"
+            exit 1
+        else  # if file is in index
+            if test -e "$file"  # file in index and in local
+            then
+                if test -e "$repo_file" # file in index, local and last_repo
+                then
+                    if ! diff -q "$file" "$index_file" > /dev/null && ! diff -q "$index_file" "$repo_file" > /dev/null  # local != index != repo
+                    then
+                        echo "$0: error: '$file' in index is different to both working file and repository"
+                        exit 1
+                    fi
+                # else  # file in index and local,but not in last_repo
+                #     echo "$0: error: '$file' has changes staged in the index"
+                #     exit 1
+                fi
+            else  # file in index but not in local
+                echo "$0: error: '$file' has changes staged in the index"
+                exit 1
+            fi
+        fi
+    done
+
+    # delete file only in index
+    for file in "$@"
+    do
+        rm .shrug/index/$file
+    done
+    exit 0
+fi
+
+
+
+
+# case : shrug-rm [--force] filenames : 
+# it tries to delete forcely file in both index and local
+# when file is not in index, error rises
+if test "$force_option" -eq 1 && test "$cached_option" -eq 0
+then
+    # do force check
+    for file in "$@"
+    do
+        if test ! -e ".shrug/index/$file"
+        then
+            echo "$0: error: '$file' is not in the shrug repository"
+            exit 1
+        fi
+    done
+
+    # delete index/files and ./files
+    for file in "$@"
+    do
+        if test -e "$file"
+        then
+            rm $file
+        fi
+        rm .shrug/index/$file
+    done
+    exit 0
+fi
+
+
+# case : shrug-rm [--force] [--cached] filenames : 
+# it tries to delete forcely file in index
+# when file is not in index, error rises
+if test "$force_option" -eq 1 && test "$cached_option" -eq 1
+then
+    # do force check
+    for file in "$@"
+    do
+        if test ! -e ".shrug/index/$file"
+        then
+            echo "$0: error: '$file' is not in the shrug repository"
+            exit 1
+        fi
+    done
+
+    # delete index/files
+    for file in "$@"
+    do
+        rm .shrug/index/$file
+    done
+    exit 0
+fi

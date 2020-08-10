@@ -1,0 +1,102 @@
+#!/bin/dash
+
+# shrug-commit [-a] -m message
+
+if test $# -ne 2 || test "$1" != "-m"
+then
+    if test $# -eq 3 && test "$1" = "-a" && test "$2" = "-m"
+    then
+        # when shrug-commit -a -m 'message'
+        message=$3
+        # 1. add updates to index
+        for index_file in $(ls .shrug/index/)
+        do
+            # check if index_file exists in current directory
+            if test -e "$index_file"
+            then
+                # add / update to index
+                shrug-add "$index_file"
+            fi
+        done
+
+        # 2. commit files
+        shrug-commit -m ""
+        exit 0
+    else
+        echo "Usage: $0 [-a] -m <message>..."
+        exit 1
+    fi
+fi
+
+# ./shrug-commit.sh -m "first commit"
+
+# content shrug.log:
+# 1 second commit
+# 0 first commit
+
+
+commit_files()
+{
+    # step 1: make current commit directory
+    # attention:
+    # we do not need to clear index/ every time
+
+    if mkdir ".shrug/repo/$1"
+    then
+
+        # step 2: copy files from index/ to repo/n/        
+        if test "`ls .shrug/index/`" = ""  # when index/ is empty
+        then
+            # do nothing
+            :
+        else  # when index/ is not empty
+            for temp_file in .shrug/index/*
+            do
+                cp "$temp_file" ".shrug/repo/$1/"
+            done
+        fi
+
+        # step 3: echo >> a commit to log
+        echo "$1 $message" > .shrug/shrug.log.tm  # temp file
+        if cat .shrug/shrug.log >> .shrug/shrug.log.tm
+        then
+            if mv .shrug/shrug.log.tm .shrug/shrug.log
+            then
+                echo "Committed as commit $1"
+                exit 0
+            fi
+        fi
+    else
+        echo "Failed to make dir: .shrug/repo/$1"
+        exit 1
+    fi
+}
+
+
+message=$2
+
+# about commit_id
+if cat .shrug/shrug.log | egrep "." > /dev/null  # if shrug.log has content
+then
+    commit_id=$(cat .shrug/shrug.log | cut -d ' ' -f1 | head -1)
+    
+    # check if there is any modify since last commit
+    if diff -q .shrug/index/ .shrug/repo/$commit_id/ > /dev/null # when no difference
+    then
+        echo "nothing to commit"
+    else  # there exists some changes
+        commit_id=$((commit_id + 1))
+        commit_files "$commit_id"
+    fi
+else  # when shrug.log has no commit records
+
+    # first test if there is some files in index
+    if test "`ls .shrug/index/`" = ""
+    then
+        echo "nothing added to index for now"
+    else
+        commit_id=0
+        commit_files "$commit_id"  
+    fi
+fi
+exit 0

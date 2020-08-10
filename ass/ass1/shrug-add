@@ -1,0 +1,41 @@
+#!/bin/dash
+
+if test $# -eq 0 
+then
+    echo "Usage: $0 filenames..."
+    exit 1
+fi
+
+if test -e ".shrug"
+then
+    for file in "$@"
+    do
+        # if file exists in local, then test filename request 
+        # then add to .shrug/index/
+        if test -e $file  
+        then
+            if echo "$file" | egrep "^[a-zA-Z0-9][.-_a-zA-Z0-9]*" > /dev/null
+            then
+                cp "$file" ".shrug/index/$file"
+            else
+                echo "bad filename $file!"
+                exit 1
+            fi
+        else
+            # echo "$file does not exist!"
+            # check if $file exits in index
+            if test -e ".shrug/index/$file"  # if file exits in index, but not in local
+            then
+                # remove $file in index
+                rm ".shrug/index/$file"
+            else  # if file does not exist either in local or index
+                echo "$0: error: can not open '$file'"
+                exit 1
+            fi
+        fi
+    done
+    # when add all files, exit
+    exit 0
+else
+    echo "$0: error: no .shrug directory containing shrug repository exists"
+fi
